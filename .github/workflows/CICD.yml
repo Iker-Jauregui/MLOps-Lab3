@@ -52,7 +52,7 @@ jobs:
           tags: ${{ env.DOCKER_IMAGE }}
           file: ./Dockerfile
       - name: Trigger Render Deploy
-        run: curl -X POST "https://api.render.com/deploy/srv-d4qm2nh5pdvs738qdca0?key=${{ secrets.RENDER_DEPLOY_HOOK_KEY }}"
+        run: curl -X POST "https://api.render.com/deploy/srv-d4qs92er433s738e5lhg?key=${{ secrets.RENDER_DEPLOY_HOOK_KEY }}"
 
 
   deploy-hf:
