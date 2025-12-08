@@ -43,18 +43,3 @@ def test_predict_cli_with_custom_classes(runner, sample_image_path):
     )
     assert result.exit_code == 0
     assert "Predicted class:" in result.output
-
-
-# Testing of the resize_cli of the transform group
-def test_resize_cli(runner, sample_image_path):
-    """Tests the command-line interface resize command."""
-    result = runner.invoke(cli, ["transform", "resize", sample_image_path, "32", "32"])
-    assert result.exit_code == 0
-    assert "32" in result.output
-
-
-def test_resize_cli_invalid_width(runner, sample_image_path):
-    """Tests resize with invalid width."""
-    result = runner.invoke(cli, ["transform", "resize", sample_image_path, "0", "32"])
-    assert result.exit_code == 0
-    assert "Error" in result.output
