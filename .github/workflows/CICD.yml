@@ -51,6 +51,20 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_IMAGE }}
           file: ./Dockerfile
+
+      # Verify image is available on DockerHub
+      - name: Verify image on DockerHub
+        run: |
+          echo "Waiting for image to be available on DockerHub..."
+          for i in {1..10}; do
+            if docker manifest inspect ${{ env.DOCKER_IMAGE }} > /dev/null 2>&1; then
+              echo "✓ Image is available on DockerHub"
+              break
+            fi
+            echo "Attempt $i/10: Image not yet available, waiting..."
+            sleep 10
+          done
+          
       - name: Trigger Render Deploy
         run: curl -X POST "https://api.render.com/deploy/srv-d4qsnrfpm1nc73bdnmlg?key=${{ secrets.RENDER_DEPLOY_HOOK_KEY }}"
 
