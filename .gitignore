@@ -1,6 +1,12 @@
 # Dataset
 data/
 
+# Trainig artifacts
+notebooks/checkpoints/
+notebooks/mlruns/
+notebooks/*.db
+notebooks/training_logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
