@@ -10,7 +10,9 @@ API_URL = "https://mlops-lab3-jauregui-latest.onrender.com"
 # Function to execute when clicking the "Predict button"
 def predict(image):
     try:
-        _, img_encoded = cv2.imencode(".jpg", image)
+        image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        
+        _, img_encoded = cv2.imencode(".jpg", image_bgr)
         files = {"file": ("image.jpg", img_encoded.tobytes(), "image/jpeg")}
 
         response = requests.post(f"{API_URL}/predict", files=files, timeout=120)
