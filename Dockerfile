@@ -23,8 +23,8 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml .
 # Copy the lock file if exists
 COPY uv.lock* .
-# Install the dependencies of the project in the system's environment
-RUN uv pip install --system --no-cache .
+# Install ONLY production dependencies (no dev dependencies)
+RUN uv sync --frozen --no-dev
 
 # Copy the source code and prepare the execution environment
 FROM base AS runtime
