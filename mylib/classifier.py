@@ -53,7 +53,7 @@ class PetClassifier:
         self.input_name = self.session.get_inputs()[0].name
         
         # Load class labels from JSON
-        with open(labels_path, 'r') as f:
+        with open(labels_path, 'r', encoding="utf-8") as f:
             class_labels_dict = json.load(f)
             # Convert keys to integers and sort by index
             self.class_labels = [class_labels_dict[str(i)] for i in range(len(class_labels_dict))]
@@ -160,6 +160,7 @@ def get_classifier():
     PetClassifier
         Global classifier instance
     """
+    # pylint: disable=global-statement
     global _classifier_instance
     if _classifier_instance is None:
         _classifier_instance = PetClassifier()

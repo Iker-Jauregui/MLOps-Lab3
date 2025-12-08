@@ -34,6 +34,8 @@ COPY --from=builder /usr/local /usr/local
 COPY api ./api
 COPY mylib ./mylib
 COPY templates ./templates
+# Copy the production model artifacts (ONNX model and class labels)
+COPY production_model ./production_model
 # Expose the port associated with the API created with FastAPI
 EXPOSE 8000
 # Default command: it starts the API with uvicorn

@@ -3,7 +3,7 @@
 import io
 import uvicorn
 from PIL import Image
-from fastapi import FastAPI, Form, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
