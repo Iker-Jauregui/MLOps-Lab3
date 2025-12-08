@@ -7,7 +7,6 @@ import numpy as np
 import onnxruntime as ort
 from pathlib import Path
 from PIL import Image
-from torchvision.models import MobileNet_V2_Weights
 
 
 class PetClassifier:
@@ -58,8 +57,10 @@ class PetClassifier:
             # Convert keys to integers and sort by index
             self.class_labels = [class_labels_dict[str(i)] for i in range(len(class_labels_dict))]
         
-        # Define preprocessing transforms
-        self.transform = self.transform = MobileNet_V2_Weights.IMAGENET1K_V1.transforms()
+        # Define preprocessing parameters (ImageNet normalization)
+        self.image_size = (224, 224)
+        self.mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+        self.std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
     
     def preprocess(self, image):
         """
@@ -83,13 +84,22 @@ class PetClassifier:
         else:
             raise ValueError(f"Unsupported image type: {type(image)}")
         
-        # Apply transforms
-        input_tensor = self.transform(image)
+        # Resize image
+        image = image.resize(self.image_size)
         
-        # Add batch dimension and convert to numpy
-        input_array = input_tensor.unsqueeze(0).numpy()
+        # Convert to numpy array and normalize to [0, 1]
+        img_array = np.array(image).astype(np.float32) / 255.0
         
-        return input_array
+        # Apply ImageNet normalization
+        img_array = (img_array - self.mean) / self.std
+        
+        # Transpose to CHW format (channels first)
+        img_array = np.transpose(img_array, (2, 0, 1))
+        
+        # Add batch dimension
+        img_array = np.expand_dims(img_array, axis=0)
+        
+        return img_array
     
     def predict(self, image_path):
         """
