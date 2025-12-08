@@ -24,7 +24,7 @@ COPY pyproject.toml .
 # Copy the lock file if exists
 COPY uv.lock* .
 # Install ONLY production dependencies (no dev dependencies)
-RUN uv sync --frozen --no-dev
+RUN uv pip install --system --no-cache --no-dev -r pyproject.toml
 
 # Copy the source code and prepare the execution environment
 FROM base AS runtime
@@ -39,4 +39,4 @@ COPY production_model ./production_model
 # Expose the port associated with the API created with FastAPI
 EXPOSE 8000
 # Default command: it starts the API with uvicorn
-CMD ["sh", "-c", "uvicorn api.api:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["uvicorn", "api.api:app", "--host", "0.0.0.0", "--port", "8000"]
