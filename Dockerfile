@@ -24,7 +24,7 @@ COPY pyproject.toml .
 # Copy the lock file if exists
 COPY uv.lock* .
 # Install ONLY production dependencies (no dev dependencies)
-RUN uv pip install --system --no-cache --no-dev -r pyproject.toml
+RUN uv pip install --system --no-cache -r pyproject.toml
 
 # Copy the source code and prepare the execution environment
 FROM base AS runtime
