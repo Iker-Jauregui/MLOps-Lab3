@@ -18,7 +18,7 @@ def client():
 @pytest.fixture
 def sample_image_bytes():
     """Create a sample image in memory for testing."""
-    img = Image.new('RGB', (100, 100), color='red')
+    img = Image.new('RGB', (224, 224), color='red')
     img_bytes = io.BytesIO()
     img.save(img_bytes, format='JPEG')
     img_bytes.seek(0)
@@ -36,13 +36,11 @@ def test_predict(client, sample_image_bytes):
     """Verify that the endpoint /predict performs the class prediction correctly."""
     response = client.post(
         "/predict",
-        files={"file": ("test.jpg", sample_image_bytes, "image/jpeg")},
-        data={"class_names": "cat,dog,bird"}
+        files={"file": ("test.jpg", sample_image_bytes, "image/jpeg")}
     )
     assert response.status_code == 200
     data = response.json()
     assert "predicted_class" in data
-    assert data["predicted_class"] in ["cat", "dog", "bird"]
 
 
 def test_predict_invalid_file(client):

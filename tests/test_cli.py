@@ -35,11 +35,8 @@ def test_predict_cli(runner, sample_image_path):
     assert "Predicted class:" in result.output
 
 
-def test_predict_cli_with_custom_classes(runner, sample_image_path):
-    """Tests predict with custom class names."""
-    result = runner.invoke(
-        cli,
-        ["inference", "predict", sample_image_path, "--class-names", "cat,dog"],
-    )
+def test_predict_cli_nonexistent_file(runner):
+    """Tests predict with non-existent file."""
+    result = runner.invoke(cli, ["inference", "predict", "nonexistent.jpg"])
     assert result.exit_code == 0
-    assert "Predicted class:" in result.output
+    assert "Error:" in result.output

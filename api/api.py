@@ -8,18 +8,24 @@ from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 
-from mylib.classifier import predict as predict_func
+from mylib.classifier import predict as predict_func, get_classifier
 
 # Create an instance of FastAPI
 app = FastAPI(
-    title="API of the Image Classifier using FastAPI",
-    description="API to perform image predictions and transforms using mylib.classifier",
+    title="API of the Pet Classifier using FastAPI",
+    description="API to perform image predictions using mylib.classifier",
     version="1.0.0",
 )
 
 # We use the templates folder to obtain HTML files
 templates = Jinja2Templates(directory="templates")
 
+# Startup event to preload the model
+@app.on_event("startup")
+async def startup_event():
+    """Load the model at startup to avoid delays on first request."""
+    get_classifier()
+    print("Model loaded successfully at startup")
 
 # Initial endpoint
 @app.get("/", response_class=HTMLResponse)
@@ -31,8 +37,7 @@ def home(request: Request):
 # Main endpoint to perform the image prediction
 @app.post("/predict")
 async def predict_endpoint(
-    file: UploadFile = File(...),
-    class_names: str = Form(default="cardboard,paper,plastic,metal,trash,glass"),
+    file: UploadFile = File(...)
 ):
     """
     Predict the class of the input image.
@@ -41,8 +46,6 @@ async def predict_endpoint(
     ----------
     file : UploadFile
         Image file to classify
-    class_names : str
-        Comma-separated class names (default: "cardboard,paper,plastic,metal,trash,glass")
 
     Returns
     -------
@@ -54,11 +57,8 @@ async def predict_endpoint(
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
 
-        # Convert class_names string to list
-        class_list = [c.strip() for c in class_names.split(",")]
-
         # Get prediction
-        prediction = predict_func(image, class_list)
+        prediction = predict_func(image)
 
         return {"predicted_class": prediction}
 
