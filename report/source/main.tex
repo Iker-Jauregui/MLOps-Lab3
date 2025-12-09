@@ -1,0 +1,242 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{pifont}  % For sparkle symbols
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    commentstyle=\color{green!50!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    columns=flexible
+}
+
+\geometry{margin=2.5cm}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\newenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+
+\begin{document}
+
+% --------------------------------------------------------------
+%                         Title
+% --------------------------------------------------------------
+
+\begin{titlepage}
+    \centering
+    \vspace*{\fill}
+    {\LARGE MLOps\par}
+    {\LARGE Lab1 - Lab2 - Lab3\par}
+    {\large Iker Jauregui Elso\par}
+    \vspace*{\fill}
+\end{titlepage}
+
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+In this report, we will see a brief summary of the project developed during \textit{Lab1}, \textit{Lab2} and \textit{Lab3} assignments of \textit{MLOps} subject, where the main idea was to develop both a CLI and an API for image classification.\\
+
+If we look back at \textit{Lab1}, we developed unit and integration tests for the \textit{predict} and \textit{resize} functionalities and we created a continuous integration (CI) workflow on \textit{GitHub} that linted (\textit{pylint}), refactored (\textit{black}) and tested (\textit{pytest}) the code.\\
+
+After that, \textit{Lab2} focused on deployment, so we could serve an API for public use. Even if our classifier was still a random guesser, we developed a \textit{Gradio} app that successfully used our API.\\
+
+On the last assignment, \textit{Lab3}, we finally trained a Deep Learning model by correctly tracking each experiment. Here we replaced the dummy random guesser by our trained model, and successfully implemented a full Machine Learning solution service. As image transformation utilities like \textit{resize} were out of the scope of the main goal of the project, in order to make code cleaner and simpler, for this last \textit{Lab3}, I personally decided to remove every hint of it from the project.\\
+
+On the following sections, on the one hand, you will be able to find the links for every repository generated on this project and, on the other hand, you will find a brief explanation of the tests implemented and the training configurations carried out in the last \textit{Lab3} assignment.
+
+\section{GitHub Repositories}
+Even if the \textit{Labs} are related between them, each one of it has its own \textit{GitHub} repository:
+
+\begin{itemize}
+    \item \textit{Lab1}: \href{https://github.com/Iker-Jauregui/MLOps-Lab1}{https://github.com/Iker-Jauregui/MLOps-Lab1}
+    \item \textit{Lab2}: \href{https://github.com/Iker-Jauregui/MLOps-Lab2}{https://github.com/Iker-Jauregui/MLOps-Lab2}
+    \item \textit{Lab3}: \href{https://github.com/Iker-Jauregui/MLOps-Lab3}{https://github.com/Iker-Jauregui/MLOps-Lab3}
+\end{itemize}
+
+\newpage
+\section{Hugging Face Spaces}
+On both \textit{Lab2} and \textit{Lab3}, a \textit{Gradio} app was implemented and deployed on \textit{Hugging Face Spaces}:
+
+\begin{itemize}
+    \item \textit{HF Space} for \textit{Lab2}: \href{https://huggingface.co/spaces/IkerJau/mlops-lab2-jauregui}{https://huggingface.co/spaces/IkerJau/mlops-lab2-jauregui}
+    \item \textit{HF Space} for \textit{Lab3}: \href{https://huggingface.co/spaces/IkerJau/mlops-lab3-jauregui}{https://huggingface.co/spaces/IkerJau/mlops-lab3-jauregui}
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/hf-mlops-lab2.png}
+    \caption{Gradio application for \textit{Lab2}.}
+    \label{fig:gradio_lab2}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/hf-mlops-lab3.png}
+    \caption{Gradio application for \textit{Lab3}.}
+    \label{fig:gradio_lab3}
+\end{figure}
+
+\newpage
+\section{Tests}
+Within this project, there are a total of three test scripts, one for each of the services or functionalities implemented in it: the image classification library/module (\textit{test\_logic.py}), the command line interface (\textit{test\_cli.py}) and the API (\textit{test\_api.py}). Even if each of them are important, we can't deny that the most valuable functionality of the project is the API, as it is the actual public service we are exposing. So, for this last part of the project (\textit{Lab3}), most of the tests were focused on assuring that the API worked correctly.
+
+\subsection{Tests for the Classification Module}
+The implemented tests aimed to assure the following aspects:
+
+\begin{itemize}
+    \item \textbf{Model Loading and Initialization}: These tests were implemented to assure that all model related artifacts (the ONNX model and the JSON containing class names) were correctly read and instantiated.
+    \item \textbf{Preprocessing Transformations}: These tests were implemented to assure that images were correctly resized and normalized before feeding to the model.
+    \item \textbf{Image Inputs}: These tests were implemented to assure the following situations:
+    \begin{itemize}
+        \item \textbf{Image File Path}: This is a normal use case. The model is fed with a valid and an existing path of an image.
+        \item \textbf{PIL Image}: This is a normal use case. The model is fed with a valid PIL image.
+        \item \textbf{Non Existing Image}: The model is fed with the path of a non existing file. The aim of this test is to assure the correct error handling under this common but problematic scenario.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Tests for the CLI}
+In this case, as this functionality isn't that important and valuable compared to the proper classifying module or the API, a basic testing was implemented:
+
+\begin{itemize}
+    \item \textbf{Basic Information}: This test assures that \textit{--help} option works correctly, showing the basic information of the command-line interface.
+    \item \textbf{Image Inputs}: Same as before, these tests were implemented to assure the following common situations:
+    \begin{itemize}
+        \item \textbf{Image File Path}: The \textit{predict} command gets a valid image file path from the command-line.
+        \item \textbf{Non Existing Image}: The \textit{predict} command gets an invalid path of a non existent image.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Tests for the API}
+The API is one of the most valuable parts of the project, but as it is a public service, it is also the most exposed and vulnerable one. So, extended tests were implemented in this part:
+
+\begin{itemize}
+    \item \textbf{Valid Image File}: This is the most normal and expected use case. A valid image file is sent to the \textit{/predict} endpoint.
+    \item \textbf{Invalid File}: This test assures that the API correctly handles the case when a non-image file is sent through it.
+    \item \textbf{Deterministic Response}: This test assures that the model has a deterministic behavior by comparing the results of two identical images.
+    \item \textbf{Different Image Formats}: These tests aim to assure the correct performance of the service when unexpected or uncommon images are employed:
+    \begin{itemize}
+        \item \textbf{Different Image Sizes}: These tests use different image resolutions to assure that both API and model correctly handle and resize these images.
+        \item \textbf{Different Image Formats}: These tests assure that the system performs correctly with various image formats (PNG, JPG, TIFF), with alpha channels (RGBA) and with grayscale images.
+    \end{itemize}
+\end{itemize}
+
+\section{Training Experiments}
+In order to train the best model, a total of three sequential experimental steps were conducted. In each one of them, an specific train parameter was analyzed, and based on the obtained results, the best value was fixed to be used on the next experiments. Even though, as it can be seen in Table \ref{tab:common_parameters}, all experiments share a common parameter configuration.
+
+\begin{table}[H]
+\scriptsize
+\begin{tabularx}{\textwidth}{llXXXX}
+\toprule
+\textbf{Parameter} & \textbf{Value for 1$^{\text{st}}$ Experiment} & \textbf{Value for 2$^{\text{nd}}$ Experiment} & \textbf{Value for 3$^{\text{rd}}$ Experiment} \\
+\midrule
+batch\_size & [32, 64, 128] & 64 & 64 \\
+\midrule
+learning\_rate& 1e-3 & 1e-3 & 1e-3 \\
+\midrule
+max\_epochs & 5 & 5 & 15 \\
+\midrule
+num\_workers & 2 & 2 & 2 \\
+\midrule
+train\_val\_split & 0.8 & 0.8 & 0.8 \\
+\midrule
+val\_test\_split & 0.5 & 0.5 & 0.5 \\
+\midrule
+optimizer & Adam & Adam & Adam \\
+\midrule
+seed & 42 & [42, 1234, 4321] & 42 \\
+\midrule
+weights & IMAGENET1K\_V1 & IMAGENET1K\_V1 & IMAGENET1K\_V1 \\
+\midrule
+frozen\_backbone & True & True & [True, False] \\
+\bottomrule
+\end{tabularx}
+\caption{Hyperparameters configuration during experiments.}
+\label{tab:common_parameters}
+\end{table}
+
+\newpage
+Here is a brief explanation of the experiments:
+\begin{itemize}
+    \item \textbf{Batch Size}: First, different training batch sizes were tested (32, 64 and 128). A batch size of 64 achieved the best performance (Figure \ref{fig:bs_losses}), so this value was fixed for the next experiments.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\linewidth]{figures/batch_size_val_loss.png}
+        \caption{Validation losses for the batch size experimental study. (Taken from \textit{MLFlow UI})}
+        \label{fig:bs_losses}
+    \end{figure}
+    \item \textbf{Random Seed}: Second, in order to see the impact of the randomization on data splits and model's structure, different random seeds were tested (42, 1234 and 4321). 1234 and 4321 values showed almost no difference on the results, but 42 seed value achieved a slightly better performance (Figure \ref{fig:seed_losses}), so this seed was fixed for the next experiments.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\linewidth]{figures/seed_val_loss.png}
+        \caption{Validation losses for the random seed experimental study. (Taken from \textit{MLFlow UI})}
+        \label{fig:seed_losses}
+    \end{figure}
+    \item \textbf{Frozen vs Unfrozen Backbone}: Until now, as requested on the assignment, all but last network layers were froze during training. So, in order to test a parameter that could make a big difference, this freezing aspect was studied by training the frozen model and a completely unfrozen model. To give the unfrozen model more time to fit, training epochs (\textit{max\_epochs}) were extended to 15. The obtained results showed that the unfrozen model achieved the worst results by far (Figure \ref{fig:frozen_losses}), so letting the network overwrite its weights (at least the way it was done) probed to be a bad idea.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\linewidth]{figures/frozen_vs_unfrozen_val_loss.png}
+        \caption{Validation losses for the random seed experimental study. Unfrozen model aborted training on epoch 10 due to early stopping. (Taken from \textit{MLFlow UI})}
+        \label{fig:frozen_losses}
+    \end{figure}
+\end{itemize}
+
+\newpage
+Regarding to the logged artifacts, for each run, training hyperparameters and different metrics (train and validation loss and accuracy) were logged. But, apart from that, some interesting artifacts were saved too:
+\begin{itemize}
+    \item \textbf{Model Checkpoint and Class Labels}: Trained model's weights and used class names and indexes were saved in order to use for prediction or to resume training from that point.
+    \item \textbf{Train and Validation Curves}: Loss and accuracies curves were plotted and saved using \textit{matplotlib.pyplot}. This may seem to be redundant with the tracked metrics, but this plots were generated referred to epochs instead of training steps. This is a more natural way of analyzing train curves and provides a common ground for all experiments, as the use of different batch sizes modifies the number of steps and makes difficult to compare plots of different runs (see Figure \ref{fig:val_acc}).
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.6\linewidth]{figures/val_acc.png}
+        \caption{Validation accuracy curves for the experiments of the batch size study. Notice how each run starts and ends at different steps even if they were trained with the same number of epochs. (Taken from \textit{MLFlow UI})}
+        \label{fig:val_acc}
+    \end{figure}
+    \newpage
+    \item \textbf{Test Accuracy and Confusion Matrix}: Finally, models were evaluated on test set and both the accuracy and the confusion matrix were stored. The confusion matrix would help us to identify which classes are being misclassified and the test accuracy would be used to rank the models and select the best one (Figure \ref{fig:cm}).
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.8\linewidth]{figures/confusion_matrix_normalized.png}
+        \caption{Confusion matrix of the best model. (Downloaded from \textit{MLFlow UI} logged artifacts)}
+        \label{fig:cm}
+    \end{figure}
+\end{itemize}
+
+\newpage
+\section{Best Model Selection}
+Finally, in order to serialize and deploy a final model for the whole application, the best model was selected based on the metrics obtained on the test set (Figure \ref{fig:test_acc}). This model belongs to the frozen trained model of the last experimental setup, and achieved a global accuracy of \textbf{91.20\%} on test set.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\linewidth]{figures/test_acc.png}
+    \caption{Accuracy on test set for all the trained models. (Taken from \textit{MLFlow UI})}
+    \label{fig:test_acc}
+\end{figure}
+
+\section{Conclusions}
+This project successfully demonstrated a complete MLOps pipeline for image classification, integrating CI/CD workflows, API deployment and train experimentation tracking. Through rigorous testing and three sequential experimental studies, we achieved a robust production ready system with a 91.20\% test accuracy using a frozen MobileNetV2 network with a batch size of 64 and a random seed of 42. 
+
+\section{Future Work}
+Future improvements could focus on reaching better test metrics by training models with data augmentation. Due to \textit{Render's} free plan's computational limitations, a shadow deployment pattern would be discouraged, as maintaining two models working in parallel at the same time would slow down too much the API response. Instead of that, a canary deployment pattern or a blue-green deployment pattern could be used to smoothly integrate new trained models with minimal risks. 
+
+\end{document}
